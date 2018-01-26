@@ -12,6 +12,7 @@ from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 
+
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
@@ -58,6 +59,7 @@ def resumable_upload(request, resource, method):
       if response is not None:
         if method == 'insert' and 'id' in response:
           print(response)
+          print 'Video upload started ...'
         elif method != 'insert' or 'id' not in response:
           print(response)
         else:
@@ -81,8 +83,8 @@ def resumable_upload(request, resource, method):
       sleep_seconds = random.random() * max_sleep
       print "Sleeping %f seconds and then retrying..." % sleep_seconds
       time.sleep(sleep_seconds)
-def print_response(response):
-  print(response)
+#def print_response(response):
+#  print(response)
 
 # Build a resource based on a list of properties given as key-value pairs.
 # Leave properties with empty values out of the inserted resource.
@@ -136,14 +138,17 @@ def remove_empty_kwargs(**kwargs):
 
 def videos_insert(client, properties, media_file, **kwargs):
   resource = build_resource(properties) # See full sample for function
+  print 'building resource properties are done ...'
   kwargs = remove_empty_kwargs(**kwargs) # See full sample for function
+  print 'processing of video properties are completed ...'
   request = client.videos().insert(
     body=resource,
     media_body=MediaFileUpload(media_file, chunksize=-1,
                                resumable=True),
     **kwargs
   )
-
+  print 'request made to the server for the upload ...'
+  print 'starting upload now ...'
   # See full sample for function
   return resumable_upload(request, 'video', 'insert')
 
@@ -153,6 +158,7 @@ if __name__ == '__main__':
   # running in production *do not* leave this option enabled.
   os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
   client = get_authenticated_service()
+  print "Client auth done"
   media_file = 'tuhi.mp4'
   if not os.path.exists(media_file):
     exit('Please specify a valid file location.')
